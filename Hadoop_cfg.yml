@@ -1,0 +1,14 @@
+
+- name: "Checking and Installing java and hadoop on remote nodes"
+  import_playbook: Install.yml
+
+- name: "Setting up Namenode"
+  import_playbook: Hadoop_nn.yml
+
+- name: "Setting up Datanode"
+  import_playbook: Hadoop_dn.yml
+
+- hosts: Namenode
+  tasks:
+        - debug:
+            msg: "Hadoop CLuster is configured. You can also check the WebUI by entering {{ groups.Namenode[0] }}:50070 in the browser URL."
