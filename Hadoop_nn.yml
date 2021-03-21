@@ -1,0 +1,54 @@
+- hosts: Namenode
+  tasks:
+          - file:
+               path: "/namenode"
+               state: directory
+            ignore_errors: yes
+            register: x
+
+          - debug:
+                  var: x
+         
+
+          - name: "Configuring hdfs-site"
+            template:
+                    src: "/ansible_code/playbooks/Hadoop-Ansible/hdfs-site_nn.xml"
+                    dest: "/etc/hadoop/hdfs-site.xml"
+
+
+          - name: "Configuring core-site"
+            template:
+                    src: "/ansible_code/playbooks/Hadoop-Ansible/core-site_nn.xml"
+                    dest: "/etc/hadoop/core-site.xml"        
+
+          - name: "Enabling the firewall"
+            ansible.posix.firewalld:
+                    port: "9001/tcp"
+                    state: enabled
+                    immediate: yes
+                    permanent: yes
+            ignore_errors: yes
+
+            ansible.posix.firewalld:
+                    port: "50070/tcp"
+                    state: enabled
+                    immediate: yes
+                    permanent: yes
+            ignore_errors: yes
+
+
+          - name: "Formatting the namenode"
+            shell: "echo Y | hadoop namenode -format"
+            when: x.changed==true
+          
+
+          - name: "Starting Namenode"
+            shell: "hadoop-daemon.sh start namenode"
+
+
+
+            
+
+   
+
+               
