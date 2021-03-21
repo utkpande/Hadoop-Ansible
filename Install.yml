@@ -1,0 +1,39 @@
+- hosts: "Namenode, Datanode"
+  tasks:
+          - name: "Checking jdk software in namenode and datanode"
+            command: "rpm -q jdk-8u171-linux-x64.rpm"
+            ignore_errors: yes
+            register: check_java
+
+          - name: "Checking Hadoop software in namenode and datanode"  
+            command: "rpm -q hadoop-1.2.1-1.x86_64.rpm"
+            ignore_errors: yes
+            register: check_hadoop
+
+          - debug:
+                  var: check_java
+                  var: check_hadoop
+
+          - name: "Copying jdk software in namenode and datanode"
+            copy:
+                 src: "/ansible_code/playbooks/Hadoop-Ansible/jdk-8u171-linux-x64.rpm"
+                 dest: "/root/jdk.rpm"
+            when: check_java.rc!=0
+
+          - name: "Installing jdk"
+            package:
+                    name: "/root/jdk.rpm"
+                    state: present
+                    disable_gpg_check: yes
+            when: check_java.rc!=0        
+
+          - name: "Copying Hadoop software in namenode and datanode"
+            copy:
+                 src: "/ansible_code/playbooks/Hadoop-Ansible/hadoop-1.2.1-1.x86_64.rpm"
+                 dest: "/root/hadoop.rpm"
+            when: check_hadoop.rc!=0
+
+          - name: "Installing Hadoop"
+            shell: "rpm -ivh /root/hadoop.rpm --force"
+            when: check_hadoop.rc!=0
+
