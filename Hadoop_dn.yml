@@ -1,0 +1,43 @@
+- hosts: Datanode
+  tasks:
+          - file:
+               path: "/datanode"
+               state: directory
+            ignore_errors: yes
+            register: x
+
+          - debug:
+                  var: x
+         
+
+          - name: "Configuring hdfs-site"
+            template:
+                    src: "/ansible_code/playbooks/Hadoop-Ansible/hdfs-site_dn.xml"
+                    dest: "/etc/hadoop/hdfs-site.xml"
+
+
+          - name: "Configuring core-site"
+            template:
+                    src: "/ansible_code/playbooks/Hadoop-Ansible/core-site_dn.xml"
+                    dest: "/etc/hadoop/core-site.xml"        
+
+          - name: "Enabling the firewall"
+            ansible.posix.firewalld:
+                    port: "9001/tcp"
+                    state: enabled
+                    immediate: yes
+                    permanent: yes
+            ignore_errors: yes
+
+          
+
+          - name: "Starting Datanode"
+            shell: "hadoop-daemon.sh start datanode"
+
+
+
+            
+
+   
+
+               
